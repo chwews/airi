@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
+
 class LayerNorm(nn.Module):
     """ LayerNorm but with an optional bias. PyTorch doesn't support simply bias=False """
 
@@ -15,6 +16,7 @@ class LayerNorm(nn.Module):
 
     def forward(self, input):
         return F.layer_norm(input, self.weight.shape, self.weight, self.bias, 1e-5)
+
 
 class CausalSelfAttention(nn.Module):
 
@@ -53,6 +55,7 @@ class CausalSelfAttention(nn.Module):
 
         y = self.resid_dropout(self.c_proj(y))
         return y
+
 
 class MLP(nn.Module):
 
@@ -197,5 +200,5 @@ def compute_loss(x, y) -> torch.Tensor:
     """
     assert y.dtype == torch.long
     assert x.shape[:-1] + (1,) == y.shape
-    x = torch.nn.functional.log_softmax(x)
+    x = torch.nn.functional.log_softmax(x, dim=-1)
     return -torch.take_along_dim(x, y, dim=len(y.shape) - 1).sum(-1).mean()

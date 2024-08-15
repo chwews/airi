@@ -5,6 +5,7 @@ from utils.task import Task, TaskPool
 from utils.gpt import compute_loss
 from utils.env import DarkRoom
 
+
 def create_data_pool(num_tasks=64, num_episodes=1000, max_epsiode_len=20, gamma=0.99):
     taskpool = TaskPool([Task() for i in range(num_tasks)])
     taskpool.train(num_episodes=num_episodes, max_episode_len=max_epsiode_len, gamma=gamma)
@@ -26,7 +27,7 @@ def train_model(model, taskpool, steps=1000, history_sample_len=50):
         optimizer.zero_grad()
         obs, actions, rewards = taskpool.sample_history(history_sample_len)
         loss = compute_loss(
-            model(obs.squeeze(-1), actions.squeeze(-1), rewards.squeeze(-1))[:, :-1, :], actions
+            model(obs.squeeze(-1).to(device), actions.squeeze(-1).to(device), rewards.squeeze(-1).to(device))[:, :-1, :], actions.to(device)
         )
         loss.backward()
         losses.append(loss.item())
@@ -75,9 +76,9 @@ def evaluate_ad(model, taskpool, max_steps, log=True, goal_from_tasks=True):
     while not done and num_steps < max_steps:
         sliced_obs, sliced_act, sliced_rew = make_input_for_eval(observations, actions, rewards, istep=num_steps)    
         pred = model(
-            obs=sliced_obs,
-            act=sliced_act,
-            rew=sliced_rew,
+            obs=sliced_obs.to(device),
+            act=sliced_act.to(device),
+            rew=sliced_rew.to(device),
         )[:, -1]
         
         dist = torch.distributions.Categorical(logits=pred)

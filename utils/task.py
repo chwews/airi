@@ -8,8 +8,9 @@ import torch.optim as optim
 from matplotlib.animation import FuncAnimation, PillowWriter
 from torch.distributions import Categorical
 from tqdm import trange
-from acrl import Actor, Critic
-from env import DarkRoom
+from .acrl import Actor, Critic
+from .env import DarkRoom
+
 
 class Task:
 
@@ -130,7 +131,6 @@ class Task:
             
         return returns
     
-
     def _one_hot_encode(self, buffer):
         length = buffer.shape[0]
         buffer = buffer.reshape((length, 1))
@@ -167,7 +167,8 @@ class Task:
         self.actor.train()
 
         return states
-    
+
+
 class TaskPool:
 
     def __init__(self, tasks):
@@ -189,9 +190,9 @@ class TaskPool:
         observations, actions, rewards = zip(*samples)
 
         return (
-            torch.tensor(observations, dtype=torch.long, device='cpu'),
-            torch.tensor(actions, dtype=torch.long, device='cpu'),
-            torch.tensor(rewards, dtype=torch.long, device='cpu') 
+            torch.tensor(np.array(observations), dtype=torch.long, device='cpu'),
+            torch.tensor(np.array(actions), dtype=torch.long, device='cpu'),
+            torch.tensor(np.array(rewards), dtype=torch.long, device='cpu') 
         )
 
     def goals(self):

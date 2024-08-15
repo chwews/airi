@@ -1,7 +1,15 @@
+import torch
+import random
 from utils.gpt import GPT, GPTConfig
 from algorithm_distillation import create_data_pool, train_model, evaluate_ad
 
+
 if __name__ == '__main__':
+    random_state = 666
+
+    torch.manual_seed(random_state)
+    random.seed(random_state)
+
     config = GPTConfig(
         block_size = 1024,
         obs_dim = 81,
@@ -18,7 +26,7 @@ if __name__ == '__main__':
     taskpool = create_data_pool(
         num_tasks=64,
         num_episodes=1000,
-        max_epsiode_len=20,
+        max_episode_len=20,
         gamma=0.99
     )
     losses = train_model(
